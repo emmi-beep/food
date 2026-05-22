@@ -689,6 +689,7 @@
         body.innerHTML = `
             <h3>${recipe.name}</h3>
             <p class="modal-time">⏱ ${recipe.time}</p>
+            ${recipe.emoji}
             <h4>Ингредиенты:</h4>
             <ul class="ingredients-list">
                 ${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}
@@ -759,7 +760,7 @@
         body.innerHTML = `
             <h3>ты нашёл пасхалку!</h3>
             <img src="images/end.jpg" alt="пасхалка" class="meme-image">
-            <p style="text-align:center; margin-top:50px;">готовь с душой:3 </p>
+            <p style="text-align:center; margin-top:50px;">:3 </p>
         `;
         modal.style.display = 'flex';
     });
