@@ -349,6 +349,30 @@
             font-size: 1em;
             padding: 0 4px;
         }
+        .meme-box {
+    margin-top: 20px;
+    background: #fff8e7;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+}
+.meme-box-title {
+    font-size: 1.1em;
+    color: #c0392b;
+    margin-bottom: 8px;
+}
+.meme-box-img {
+    max-width: 250px;
+    margin: 0 auto;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.meme-box-img img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+}
     </style>
 </head>
 <body>
@@ -383,9 +407,11 @@
                     <p style="font-size:0.8em; color:#8d6e63; margin-top:5px;">* Нажми «В мой план» в рецепте и выбери день</p>
                 </div>
             </div>
-            <div class="helper-box">
-    <img src="images/meow.jpg" alt="мем дня" class="meme-image">
-</div>
+            <div class="meme-box">
+    <h3 class="meme-box-title">настроение дня</h3>
+    <div class="meme-box-img">
+        <img src="images/mem.jpg" alt="мем дня">
+    </div>
         </aside>
 
         <div class="meals-grid" id="mealsGrid">
