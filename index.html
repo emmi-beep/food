@@ -144,7 +144,6 @@
             color: #8d6e63;
             margin-top: 4px;
         }
-        /* Модальное окно */
         .modal {
             display: none;
             position: fixed;
@@ -360,7 +359,6 @@
     </header>
 
     <div class="main-content">
-        <!-- Левая колонка -->
         <aside class="sidebar">
             <div class="instruction">
                 <h2>Как пользоваться</h2>
@@ -369,39 +367,30 @@
                 <p>3. Если лень выбирать — нажми кнопку рандом!, и получишь случайный обед)</p>
             </div>
             <button class="random-btn" id="randomBtn">рандом!</button>
-
-            <!-- Планировщик с вкладками -->
             <div class="plan-box">
                 <div class="plan-tabs">
                     <button class="plan-tab active" data-tab="preset">Примерный план</button>
                     <button class="plan-tab" data-tab="custom">Мой план</button>
                 </div>
-
-                <!-- Готовый план на неделю -->
                 <div class="plan-tab-content active" id="presetPlan">
                     <div id="presetWeekPlan">
                         <!-- заполнится через JS -->
                     </div>
                 </div>
 
-                <!-- Мой план (таблица по дням) -->
                 <div class="plan-tab-content" id="customPlan">
                     <div id="customWeekPlan">
-                        <!-- заполнится через JS -->
                     </div>
                     <p style="font-size:0.8em; color:#8d6e63; margin-top:5px;">* Нажми «В мой план» в рецепте и выбери день</p>
                 </div>
             </div>
         </aside>
 
-        <!-- Правая часть: карточки блюд -->
         <div class="meals-grid" id="mealsGrid">
-            <!-- Динамически заполнится через JS -->
         </div>
     </div>
 </div>
 
-<!-- Модальное окно -->
 <div class="modal" id="modal">
     <div class="modal-content" id="modalContent">
         <button class="modal-close" id="modalClose">&times;</button>
@@ -409,7 +398,6 @@
     </div>
 </div>
 
-<!-- Футер с пасхалкой -->
 <footer>
     <span>© диди, 2026</span><br>
     <span class="emod" id="emod1" title="нажми!">🫂<-</span>
