@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Что есть кроме макарон с сосисками?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Comfortaa';
+            font-weight: 900;
+            background: #fdf6ec;
+            color: #4e342e;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            font-size: 2.5em;
+            color: #c0392b;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            color: #8d6e63;
+        }
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .sidebar {
+            flex: 1 1 320px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .sidebar h2 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #c0392b;
+        }
+        .instruction {
+            background: #fff8e7;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+        }
+        .instruction p {
+            margin-bottom: 8px;
+        }
+        .random-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.2em;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 4px 8px rgba(211,84,0,0.3);
+        }
+        .random-btn:hover {
+            background: linear-gradient(135deg, #d35400, #b83b00);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(211,84,0,0.4);
+        }
+        .meals-grid {
+            flex: 3 1 900px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-content: flex-start;
+        }
+        .category-title {
+            width: 100%;
+            font-size: 1.8em;
+            font-style: bold;
+            color: #5d4037;
+            margin: 15px 0 5px 0;
+            border-bottom: 2px solid #e67e22;
+            padding-bottom: 5px;
+        }
+        .meal-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            padding: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e8d5c4;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            width: calc(33.333% - 5px);
+            min-width: 200px;
+        }
+        .meal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: #c0392b;
+        }
+        .meal-emoji {
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .meal-emoji img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .meal-name {
+            font-weight: 500;
+            font-size: 1em;
+            color: #4e322e;
+            text-align: left;
+            flex: 1;
+        }
+        .meal-time {
+            font-size: 0.8em;
+            color: #8d6e63;
+            margin-top: 4px;
+        }
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 18px;
+            max-width: 600px;
+            width: 100%;
+            padding: 25px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
+        .modal h3 {
+            color: #c0392b;
+            margin-bottom: 5px;
+            font-size: 1.6em;
+        }
+        .modal-time {
+            color: #8d6e63;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+        .ingredients-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+        .ingredients-list li {
+            background: #fce4d6;
+            margin: 4px 0;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        .recipe-text {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            white-space: pre-line;
+        }
+        .random-result .meal-item {
+            margin: 8px 0;
+            font-weight: 500;
+        }
+        .random-result .meal-item span {
+            color: #c0392b;
+            font-weight: bold;
+        }
+        .btn-small {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        @media (max-width: 700px) {
+            .meal-card {
+                width: calc(50% - 10px);
+            }
+        }
+        @media (max-width: 480px) {
+            .meal-card {
+                width: 100%;
+            }
+        }
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #5d4037;
+            font-size: 1.1em;
+        }
+        .emod {
+            cursor: pointer;
+            font-size: 1.3em;
+            display: inline-block;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+        .emod:hover {
+            transform: scale(1.1);
+        }
+        .meme-image {
+            max-width: 100%;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+        .helper-box {
+            margin-top: 20px;
+            background: #fff8e7;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .helper-box h3 {
+            font-size: 1.1em;
+            color: #c0392b;
+            margin-bottom: 8px;
+        }
+        .helper-box input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #e8d5c4;
+            margin: 8px 0;
+            font-family: 'Comfortaa', cursive;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e67e22;
+            color: #e67e22;
+            margin-left: 5px;
+        }
+        .btn-outline:hover {
+            background: #fef0e6;
+        }
+        .plan-box {
+            margin-top: 20px;
+            background: #fff8e7;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .plan-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .plan-tab {
+            flex: 1;
+            padding: 6px 4px;
+            background: #f0e0cc;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 0.9em;
+            color: #5d4037;
+            transition: background 0.2s;
+            font-family: 'Comfortaa', cursive;
+        }
+        .plan-tab.active {
+            background: #e67e22;
+            color: white;
+        }
+        .plan-tab-content {
+            display: none;
+        }
+        .plan-tab-content.active {
+            display: block;
+        }
+        .day-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #e8d5c4;
+            font-size: 0.9em;
+        }
+        .day-name {
+            font-weight: 700;
+            width: 30px;
+            color: #5d4037;
+        }
+        .day-meal {
+            flex: 1;
+            margin: 0 8px;
+            color: #4e342e;
+            cursor: pointer;
+        }
+        .day-meal:hover {
+            text-decoration: underline;
+        }
+        .day-clear {
+            background: none;
+            border: none;
+            color: #c0392b;
+            cursor: pointer;
+            font-size: 1em;
+            padding: 0 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Что же есть кроме макарон с сосисками?) </h1>
+        <p class="subtitle">Выбирай сам или используй рандомайзер, если лень думать</p>
+    </header>
+
+    <div class="main-content">
+        <!-- Левая колонка -->
+        <aside class="sidebar">
+            <div class="instruction">
+                <h2>Как пользоваться</h2>
+                <p>1. Кликни на карточку блюда — увидишь рецепт и нужные ингредиенты.</p>
+                <p>2. Можно выбирать любые позиции из каждой категории(они все неплохо сочетаются между собой)</p>
+                <p>3. Если лень выбирать — нажми кнопку рандом!, и получишь случайный обед)</p>
+            </div>
+            <button class="random-btn" id="randomBtn">рандом!</button>
+
+            <!-- Планировщик с вкладками -->
+            <div class="plan-box">
+                <div class="plan-tabs">
+                    <button class="plan-tab active" data-tab="preset">Примерный план</button>
+                    <button class="plan-tab" data-tab="custom">Мой план</button>
+                </div>
+
+                <!-- Готовый план на неделю -->
+                <div class="plan-tab-content active" id="presetPlan">
+                    <div id="presetWeekPlan">
+                        <!-- заполнится через JS -->
+                    </div>
+                </div>
+
+                <!-- Мой план (таблица по дням) -->
+                <div class="plan-tab-content" id="customPlan">
+                    <div id="customWeekPlan">
+                        <!-- заполнится через JS -->
+                    </div>
+                    <p style="font-size:0.8em; color:#8d6e63; margin-top:5px;">* Нажми «В мой план» в рецепте и выбери день</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Правая часть: карточки блюд -->
+        <div class="meals-grid" id="mealsGrid">
+            <!-- Динамически заполнится через JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal" id="modal">
+    <div class="modal-content" id="modalContent">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<!-- Футер с пасхалкой -->
+<footer>
+    <span>© диди, 2026</span><br>
+    <span class="emod" id="emod1" title="нажми!">🫂<-</span>
+</footer>
+
+<script>
+    // ========== БАЗА ДАННЫХ РЕЦЕПТОВ ==========
+    const recipes = [
+        // Вторые блюда и гарниры
+        {
+            id: 'tefteli',
+            category: 'second',
+            emoji: '<img src="images/tef.jpg" alt="Тефтели" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Тефтели в томатном соусе с гречкой',
+            time: '40-50 мин',
+            ingredients: ['400 г(1 пачка) фарша (свинина/говядина)', '1 луковица', '3-5 ст. л. томатной пасты', 'вода полстакана ', 'мука для панировки', 'гречка', 'соль, итальянские травы, чеснок(сушеный)'],
+            recipe: '1. Смешать фарш, итальянские травы, чеснок соль, перец, чеснок. Слепить круглые тефтели, обвалять в муке.\n2. Обжарить тефтели на сковороде до румяности.\n3. Смешать томатную пасту и воду, залить к тефтелям, тушить под крышкой 20-30 минут на средне-слабом огне.\n4. Гречку отварить отдельно (1:2 воды) и кушать вместе.'
+        },
+        {
+            id: 'farsh-ovoshi',
+            category: 'second',
+            emoji: '<img src="images/kwv.jpg" alt="кур" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Куриный фарш с замороженными овощами',
+            time: '10-15 мин',
+            ingredients: ['400 г(упаковка) куриного фарша', '1 упаковка замороженной мексиканской смеси(или другой овощной) (400 г)', 'соевый соус (3 ст. л.)', 'масло, специи по вкусу'],
+            recipe: '1.Обжарить фарш, разбить комки, жарить 5-7 минут.\n2. Всыпать замороженные овощи, перемешать, добавить соевый соус и любимые специи (чеснок, чили есои хочется поострее).\n3. Тушить под крышкой 10-12 минут до готовности овощей.\n4.Можно есть как самостоятельное блюдо либо дополнить его рисом, макаронами, фунчозой:)'
+        },
+        {
+            id: 'funchoza',
+            category: 'second',
+            emoji: '<img src="images/fu.jpg" alt="фу" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Фунчоза с курицей',
+            time: '30-35 мин',
+            ingredients: ['1-2 кулька фунчозы', '200 г куриного филе', '1 морковь', '1 перец болгарский (по желанию)','1 огурец', '3 ст. л. соевого соуса', 'чеснок, масло, кунжут (опционально)'],
+            recipe: '1. Фунчозу залить кипятком на 3-5 минут, откинуть на дуршлаг, промыть холодной водой, заправить соевым соусом(чут чут!!).\n2. Куриное филе нарезать как удобно, заправить чесноком, соевым соусом, обжарить на средне-сильном огне 5 минут.\n3. Добавить нарезанные морковь, огурец и перец, жарить ещё 3 минуты.\n4. Положить фунчозу, выдавить чеснок, прогреть 2 минуты помешивая.'
+        },
+        {
+            id: 'pelmeni',
+            category: 'second',
+            emoji: '<img src="images/pel.jpg" alt="пел" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Пельмени)',
+            time: '15 мин',
+            ingredients: ['пельмени', '3 ст. л. сметаны или майонез...', '1 зубчик чеснока', 'укроп (сушёный или свежий)', 'соль, перец'],
+            recipe: '1. Отварить пельмени в подсоленной воде до всплытия + ещё 2 минуты.\n2. Для соуса смешать сметану(майонез), тёртый чеснок, рубленый укроп, немного соли.\n3. Подавать пельмени политыми соусом или макать.'
+        },
+        {
+            id: 'kartoshka-tushenka',
+            category: 'second',
+            emoji: '<img src="images/kwt.jpg" alt="кт" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Картошка с тушёнкой',
+            time: '30-35 мин',
+            ingredients: ['6-8 средних картофелин', '1 банка тушёнки (говядина/свинина)', 'масло сливочное(30г)', 'молоко(100мл или на глаз..)',' соль, специи'],
+            recipe: '1. Картофель нарезать кубиками, отварить \n2. Размять картофель, добавить сливочное масло, молоко, получаем пюре.\n3. Добавить тушенку в картошку, перемешать.\n4. Готово вы великолепны!'
+        },
+        {
+            id: 'rice-egg',
+            category: 'second',
+            emoji: '<img src="images/rice.jpg" alt="рис" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Жареный рис с овощами и яйцом',
+            time: '10-15 мин',
+            ingredients: ['150 г отварного риса (лучше даже вчерашнего)', '1 яйцо', '1 морковь', 'замороженные овощи(мексиканская смесь и тд.)', 'соевый соус, масло, чеснок'],
+            recipe: '1. Морковь мелко нарезать, обжарить на сильном огне 3 минуты с замороженными овощами.\n2. Сдвинуть овощи в сторону, влить предварительно взбитое в стакане яйцо, быстро размешать.\n3. Добавить рис, соевый соус, продавленный чеснок, жарить ещё 3-4 минуты, помешивая.'
+        },
+        {
+            id: 'rice-chicken',
+            category: 'second',
+            emoji: '<img src="images/price.jpg" alt="кр" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Рис с курицей (простой плов)',
+            time: '55-60 мин',
+            ingredients: ['1 стакан риса', '200 г куриного бедра/филе', '1 луковица', '1 морковь', '3 зубчика чеснока', 'приправа для плова(или томаты/базилик/чеснок от магги), масло, соль'],
+            recipe: '1. Курицу нарезать кусочками, добавить воды чтобы был небольшой слой в сковородке, обжарить на среднем огне 20-30 минут .\n2. Добавить лук, тёртую морковь, готовить 4 минуты.\n3. Всыпать промытый рис, залить 1.5-2 стаканами кипятка, воткнуть целые зубчики чеснока, посыпать приправой.\n4. Довести до кипения, убавить огонь, накрыть крышкой и томить 25 минут не открывая.'
+        },
+        {
+            id: 'pasta',
+            category: 'second',
+            emoji: '<img src="images/mak.jpg" alt="макр" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Макароны (3 варианта)',
+            time: '15-35 мин',
+            ingredients: ['200 г макарон', 'Для сырного: 50 г сыра, колбаса, чеснок, масло', 'Для томатного: колбаса, 2 ст. л. томатной пасты', 'Паста с рецептов с приправ магги: курица, сливки, грибы, специя для этих макарон '],
+            recipe: 'Отварить макароны по инструкции.\nВариант 1: горячие макароны заправить маслом, тёртым сыром и чесноком.\nВариант 2: обжарить кубики колбасы, добавить томатную пасту и 3 ст. л. воды, смешать с макаронами.\nВариант 3: найду эту специю вставлю рецепт с нее...'
+        },
+        {
+            id: 'rice',
+            category: 'second',
+            emoji: '<img src="images/ricee.jpg" alt="р" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Рис',
+            time: '30 мин',
+            ingredients: ['1 стакан риса', '2 стакана воды', 'соль'],
+            recipe: '1.Промой крупу под проточной водой, пока вода не станет прозрачной.\n2.Положи рис в кастрюлю с толстым дном. Залей холодной водой. Добавь соль.\n3.Поставь кастрюлю на сильный огонь без крышки. Как только вода закипит, перемешай рис, чтобы зерна не прилипли ко дну \n4.Убавь огонь до самого минимума и плотно накройте кастрюлю крышкой. Не поднимайте ее и не мешай рис в процессе! Вари около 15–20 минут, пока вся вода не впитается'
+        },
+        {
+            id: 'cereal',
+            category: 'second',
+            emoji: '<img src="images/cer.jpg" alt="р" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Гречка',
+            time: '25 мин',
+            ingredients: ['1 стакан гречки', '2 стакана воды', 'соль'],
+            recipe: '1.Промой крупу под проточной водой, пока вода не станет прозрачной.\n2.Положи гречку в кастрюлю с толстым дном. Залей холодной водой. Добавь соль.\n3.Поставь кастрюлю на сильный огонь без крышки. Как только вода закипит, перемешай гречку, чтобы зерна не прилипли ко дну \n4.Убавь огонь до самого минимума и плотно накройте кастрюлю крышкой. Не поднимайте ее и не мешай гречку в процессе! Вари около 15–20 минут, пока вся вода не впитается'
+        },
+        {
+    id: 'omelet-vegetables',
+    category: 'second',
+    emoji: '<img src="images/omelet.jpg" alt="омлет" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+    name: 'Омлет с замороженными овощами(+курица)',
+    time: '15 мин',
+    ingredients: ['3 яйца', '3 ст.л. молока', 'горсть замороженных овощей (мексиканская смесь)', 'соль, перец', 'масло для жарки','курица'],
+    recipe: '1. Взбить яйца с молоком, солью и перцем.\n2. На сковороде обжарить замороженные овощи 2 минуты(если хочется, то на этом этапе добавляем курицу и жарим овощи вместе с ней)\n3. Залить яичной смесью, накрыть крышкой и готовить на слабом огне 7-8 минут до схватывания верха.'
+},
+{
+    id: 'potato-pancakes',
+    category: 'second',
+    emoji: '<img src="images/draniki.jpg" alt="драники" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+    name: 'Драники ',
+    time: '25 мин',
+    ingredients: ['4 средние картофелины', '1 яйцо', '2 ст.л. муки', 'соль, перец', 'масло для жарки', 'соус/сметана'],
+    recipe: '1. Картофель натереть на мелкой тёрке, отжать лишнюю жидкость.\n2. Добавить яйцо, муку, соль, перец, перемешать.\n3. Выкладывать ложкой на разогретую сковороду с маслом, формируя тонкие лепёшки.\n4. Жарить с двух сторон до золотистой корочки (по 3-4 минуты).'
+},
+        // Салаты
+        {
+            id: 'salad-morskoy',
+            category: 'salad',
+            emoji: '<img src="images/s1.jpg" alt="р" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Салат с тунцом',
+            time: '20 мин',
+            ingredients: ['пекинская капуста (или салат айсберг)', '1/2 банки тунца', 'треть банки кукурузы', '2 варёных яйца', '1 свежий огурец', 'масло, соль'],
+            recipe: '1. Капусту нарезать тонко, если салат то порвать руками.\n2. Огурец и яйца нарезать кубиками.\n3. Тунец размять вилкой, добавить кукурузу.\n4. Всё смешать, заправить маслом и солью.'
+        },
+        {
+            id: 'salad-hrust',
+            category: 'salad',
+            emoji: '<img src="images/s2.jpg" alt="к" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Салат с сельдереем',
+            time: '15 мин',
+            ingredients: ['2 стебля сельдерея', '1 морковь', '1 огурец', '3 ст. л. консервированной кукурузы или горошка', 'итальянские травы, масло, соль'],
+            recipe: 'Сельдерей, морковь и огурец нарезать тонко или натереть. Добавить кукурузу/горошек, посыпать травами, заправить маслом и солью.'
+        },
+        {
+            id: 'salad-egg-tuna',
+            category: 'salad',
+            emoji: '<img src="images/sk.jpg" alt="кs" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Салат с капустой',
+            time: '15 мин',
+            ingredients: ['150 г квашеной капусты', '1/2 банка тунца', '2 варёных яйца','1 огурец','масло, перец чили'],
+            recipe: 'Капусту слегка отжать. Яйца нарубить, огурцы порезать, смешать всё, заправить маслом и по желанию острым перцем чили.'
+        },
+        {
+            id: 'salad-classic',
+            category: 'salad',
+            emoji: '<img src="images/sb.jpg" alt="yр" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Базовый салатик из помидоров и огурцов',
+            time: '10 мин',
+            ingredients: ['2 помидора', '2 огурца', 'пол-луковицы или зелёный лук', 'укроп, масло, соль'],
+            recipe: 'Нарезать овощи крупно, добавить рубленую зелень, посолить, заправить маслом.'
+        },
+        {
+            id: 'salad-conserv',
+            category: 'salad',
+            emoji: '<img src="images/s5.jpg" alt="р" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Салат "вкусное месиво"',
+            time: '20 мин',
+            ingredients: ['полбанки кукурузы', 'полбанки зелёного горошка', '2 варёных яйца', '2 маринованный огурец', 'масло'],
+            recipe: 'Яйца и маринованный огурец нарезать кубиками. Смешать с кукурузой и горошком, заправить маслом. Солить не надо!'
+        },
+        {
+            id: 'salad-6',
+            category: 'salad',
+            emoji: '<img src="images/s6.jpg" alt="р" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Вкусное месиво 2"',
+            time: '20 мин',
+            ingredients: ['полбанки кукурузы', 'курица (фарш или грудка)', '2 варёных яйца', 'салат/пекинская капуста', 'сыр тертый','помидоры','майонез/сметана'],
+            recipe: 'Яйца, помидоры, курицу нарезать. Смешать с кукурузой и салатом, заправить майонезом/сметаной. Посолить, добавить специи! Еще можно сюда же закинуть морковь/сухарики из белого хлеба, это вообще гастрономический оргазм будет;)'
+        },
+        // Супы
+        {
+            id: 'soup-cheese',
+            category: 'soup',
+            emoji: '<img src="images/ss.jpg" alt="кр" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Сырный суп с овощами',
+            time: '60 мин',
+            ingredients: ['1 плавленый сырок («Дружба»)', '3 картофелины', '1 морковь', 'пол-луковицы', 'масло', 'специи (Магги кубик+ лавровый лист)'],
+            recipe: '1. В 1.5л  кипящей воды положить кубики картофеля, варить до готовности. \n2. Лук и морковь пожарить до золотистого цвета на масле, добавить в суп.\n3. Когда картофель готов, добавить разломанный сырок, мешать до растворения, но без кипения.\n4. Приправить специями, прогреть ещё минуту.'
+        },
+        {
+            id: 'borsh',
+            category: 'soup',
+            emoji: '<img src="images/borsh.jpg" alt="борщ" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Борщ упрощённый',
+            time: '60 мин',
+            ingredients: ['1 свёкла (варёная или сырая)', '2 картофелины', '200 г капусты (свежей или квашеной)', '1 морковь', '1 луковица', '2 ст. л. томатной пасты', 'чеснок, сметана, зелень'],
+            recipe: '1. Свёклу натереть, потушить с томатной пастой и парой ложек воды 5 мин.\n2. В кастрюлю с 0,8 л кипятка положить нарезанный картофель и капусту, варить 12 мин.\n3. Добавить пожаренные лук с морковью и тушёную свёклу.\n4. Варить ещё 7-10 мин, заправить давленым чесноком и зеленью.'
+ },
+ {
+     id: 'soup-noodle-chicken',
+    category: 'soup',
+    emoji: '<img src="images/lapsha.jpg" alt="куриная лапша" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+    name: 'Куриная лапша',
+    time: '30 мин',
+    ingredients: ['1 куриное бедро', '1 морковь', '1 луковица', '2 картофелины', '100 г вермишели/лапши', 'зелень, соль'],
+    recipe: '1. Курицу залить водой, варить 20 минут после закипания, снимая пену.\n2. Добавить нарезанные картофель, лук и морковь, варить 10 минут.\n3. Всыпать лапшу, варить ещё 3-4 минуты. Достать курицу, отделить мясо от костей, вернуть в суп. Посолить, добавить зелень.'
+},
+        // Быстрые перекусы
+        {
+            id: 'snack-apple',
+            category: 'snack',
+            emoji: '<img src="images/suh.jpg" alt="щ" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Сухарики',
+            time: '10 мин',
+            ingredients: ['пара кусков хлеба', 'соль, чеснок, масло'],
+            recipe: 'Нарезать хлеб на кусочки, положить в тарелку, добавить соль, чеснок, масло, готовить на медленном огне без крышки .'
+        },
+        {
+            id: 'snack-smoothie',
+            category: 'snack',
+            emoji: '<img src="images/buter.jpg" alt="борщ" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Бутеры',
+            time: '10 мин',
+            ingredients: ['хлеб, сыр, колбаса/ветчина, огурец, помидор'],
+            recipe: 'ну в целом базовый бутерброд просто можно сделать. еще бутерброд с сыром и огурцом/помидором.'
+        },
+        {
+            id: 'snack-tvorog',
+            category: 'snack',
+            emoji: '<img src="images/tv.jpg" alt="борщ" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+            name: 'Творог с печенькой',
+            time: '5 мин',
+            ingredients: ['100 г творога', 'печеньки/шоколадка','чут чут молока'],
+            recipe: 'Смешать творог с печеньками/шоколадкой и молоком, перемешать и суперзавтрак готов!'
+        },
+        {
+    id: 'snack-lavash',
+    category: 'snack',
+    emoji: '<img src="images/lavash.jpg" alt="лаваш" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+    name: 'Лаваш с сыром и колбасой',
+    time: '5 мин',
+    ingredients: ['1 лаваш', '50 г сыра', 'чеснок/зелень', 'масло'],
+    recipe: 'Лаваш разрезать, выложить тёртый сыр, колбасу и чеснок, свернуть конвертом. Обжарить на масле по 1-2 минуты с каждой стороны.'
+},
+{
+    id: 'snack-sosiska-testo',
+    category: 'snack',
+    emoji: '<img src="images/sosiska.jpg" alt="сосиска" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">',
+    name: 'Сосиска в лаваше',
+    time: '5 мин',
+    ingredients: ['1 сосиска', 'лаваш/хлеб', 'кетчуп/горчица', 'сыр'],
+    recipe: 'Сосиску отварить или обжарить или в микроволновке, затем завернуть в лаваш с соусом и сыром. Можно обжарить ещё 1 минуту.'
+},
+
+    ];
+
+    // Генерация карточек
+    function renderCards() {
+        const grid = document.getElementById('mealsGrid');
+        grid.innerHTML = ''; 
+
+        const categories = [
+            { title: 'Вторые блюда', key: 'second' },
+            { title: 'Салаты', key: 'salad' },
+            { title: 'Супы', key: 'soup' },
+            { title: 'Перекусы', key: 'snack' }
+        ];
+
+        categories.forEach(cat => {
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'category-title';
+            titleDiv.textContent = cat.title;
+            grid.appendChild(titleDiv);
+
+            const catRecipes = recipes.filter(r => r.category === cat.key);
+            catRecipes.forEach(recipe => {
+                const card = document.createElement('div');
+                card.className = 'meal-card';
+                card.innerHTML = `
+                    <div class="meal-emoji">${recipe.emoji}</div>
+                    <div>
+                        <div class="meal-name">${recipe.name}</div>
+                        <div class="meal-time">⏱ ${recipe.time}</div>
+                    </div>
+                `;
+                card.addEventListener('click', () => openRecipeModal(recipe));
+                grid.appendChild(card);
+            });
+        });
+    }
+
+    // Открытие модального окна с рецептом
+    function openRecipeModal(recipe) {
+        const modal = document.getElementById('modal');
+        const body = document.getElementById('modalBody');
+        body.innerHTML = `
+            <h3>${recipe.name}</h3>
+            <p class="modal-time">⏱ ${recipe.time}</p>
+            <h4>Ингредиенты:</h4>
+            <ul class="ingredients-list">
+                ${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}
+            </ul>
+            <h4>Приготовление:</h4>
+            <div class="recipe-text">${recipe.recipe}</div>
+            <button class="btn-small" style="margin-top:10px; background:#c0392b;" onclick="addToCustomPlanPrompt('${recipe.id}')">В мой план</button>
+        `;
+        modal.style.display = 'flex';
+    }
+
+    // Закрытие модального окна
+    document.getElementById('modalClose').addEventListener('click', () => {
+        document.getElementById('modal').style.display = 'none';
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('modal')) {
+            document.getElementById('modal').style.display = 'none';
+        }
+    });
+
+    // Рандомный обед
+    function generateRandomMeal() {
+        const second = recipes.filter(r => r.category === 'second');
+        const salad = recipes.filter(r => r.category === 'salad');
+        const soup = recipes.filter(r => r.category === 'soup');
+
+        const randomSecond = second[Math.floor(Math.random() * second.length)];
+        const randomSalad = salad[Math.floor(Math.random() * salad.length)];
+        const includeSoup = Math.random() < 0.6;
+        const randomSoup = includeSoup ? soup[Math.floor(Math.random() * soup.length)] : null;
+
+        let allIngredients = [...randomSecond.ingredients, ...randomSalad.ingredients];
+        if (randomSoup) {
+            allIngredients = allIngredients.concat(randomSoup.ingredients);
+        }
+        allIngredients = [...new Set(allIngredients)];
+
+        const modal = document.getElementById('modal');
+        const body = document.getElementById('modalBody');
+        body.innerHTML = `
+            <h3>Твой случайный обед</h3>
+            <div class="random-result">
+                <p class="meal-item"> <span>Второе:</span> ${randomSecond.name}</p>
+                <p class="meal-item"> <span>Салат:</span> ${randomSalad.name}</p>
+                ${randomSoup ? `<p class="meal-item"> <span>Суп:</span> ${randomSoup.name}</p>` : '<p class="meal-item"> <span>Суп:</span> сегодня без супа</p>'}
+            </div>
+            <h4 style="margin-top:20px;"> Общий список ингридиентов</h4>
+            <ul class="ingredients-list">
+                ${allIngredients.map(i => `<li>${i}</li>`).join('')}
+            </ul>
+            <p style="margin-top:10px; font-style:italic;">приятного аппетита!!</p>
+            <button class="btn-small" id="rerollBtn">ещё раз! </button>
+        `;
+        modal.style.display = 'flex';
+
+        document.getElementById('rerollBtn').addEventListener('click', () => {
+            generateRandomMeal();
+        });
+    }   document.getElementById('randomBtn').addEventListener('click', generateRandomMeal);
+
+    renderCards();
+
+    // Пасхалка — открыть мем
+    document.getElementById('emod1').addEventListener('click', () => {
+        const modal = document.getElementById('modal');
+        const body = document.getElementById('modalBody');
+        body.innerHTML = `
+            <h3>ты нашёл пасхалку!</h3>
+            <img src="images/end.jpg" alt="пасхалка" class="meme-image">
+            <p style="text-align:center; margin-top:50px;">готовь с душой:3 </p>
+        `;
+        modal.style.display = 'flex';
+    });
+
+    // ========== ПЛАНИРОВЩИК С ВКЛАДКАМИ ==========
+    const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+    // Примерный план
+    const presetWeeklyPlan = {
+        'Пн': 'tefteli',
+        'Вт': 'tefteli',
+        'Ср': 'farsh-ovoshi',
+        'Чт': 'soup-cheese',
+        'Пт': 'soup-cheese',
+        'Сб': 'potato-pancakes',
+        'Вс': 'pelmeni'
+    };
+
+    // Пользовательский план: объект { день: id блюда }
+    let customPlan = JSON.parse(localStorage.getItem('customPlan')) || {};
+
+    function getRecipeById(id) {
+        return recipes.find(r => r.id === id);
+    }
+
+    // Рендер примерного плана
+    function renderPresetPlan() {
+        const container = document.getElementById('presetWeekPlan');
+        if (!container) return;
+        container.innerHTML = '';
+        daysOfWeek.forEach(day => {
+            const recipeId = presetWeeklyPlan[day];
+            const recipe = getRecipeById(recipeId);
+            const row = document.createElement('div');
+            row.className = 'day-row';
+            row.innerHTML = `
+                <span class="day-name">${day}</span>
+                <span class="day-meal">${recipe ? recipe.name : '—'}</span>
+            `;
+            if (recipe) {
+                row.querySelector('.day-meal').addEventListener('click', () => openRecipeModal(recipe));
+            }
+            container.appendChild(row);
+        });
+    }
+
+    // Рендер пользовательского плана (таблица дней)
+    function renderCustomPlan() {
+        const container = document.getElementById('customWeekPlan');
+        if (!container) return;
+        container.innerHTML = '';
+        daysOfWeek.forEach(day => {
+            const recipeId = customPlan[day];
+            const recipe = recipeId ? getRecipeById(recipeId) : null;
+            const row = document.createElement('div');
+            row.className = 'day-row';
+            row.innerHTML = `
+                <span class="day-name">${day}</span>
+                <span class="day-meal">${recipe ? recipe.name : '—'}</span>
+                ${recipe ? `<button class="day-clear" data-day="${day}">✕</button>` : ''}
+            `;
+            if (recipe) {
+                row.querySelector('.day-meal').addEventListener('click', () => openRecipeModal(recipe));
+                row.querySelector('.day-clear').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    delete customPlan[day];
+                    saveCustomPlan();
+                    renderCustomPlan();
+                });
+            }
+            container.appendChild(row);
+        });
+    }
+
+    function saveCustomPlan() {
+        localStorage.setItem('customPlan', JSON.stringify(customPlan));
+    }
+
+    // Функция, вызываемая из модального окна: запрашивает день и добавляет блюдо
+    window.addToCustomPlanPrompt = function(recipeId) {
+        const day = prompt('На какой день добавить? (Пн, Вт, Ср, Чт, Пт, Сб, Вс)');
+        if (!day || !daysOfWeek.includes(day)) {
+            alert('Введи сокращение дня правильно (Пн, Вт, Ср, Чт, Пт, Сб, Вс)');
+            return;
+        }
+        customPlan[day] = recipeId;
+        saveCustomPlan();
+        renderCustomPlan();
+        alert(`Добавлено в ${day}: ${getRecipeById(recipeId).name}`);
+    };
+
+    // Переключение вкладок
+    document.querySelectorAll('.plan-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.plan-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.plan-tab-content').forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            const target = document.getElementById(tab.dataset.tab + 'Plan');
+            if (target) target.classList.add('active');
+        });
+    });
+
+    // Инициализация планировщика
+    renderPresetPlan();
+    renderCustomPlan();
+</script>
+</body>
+</html>
