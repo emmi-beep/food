@@ -373,6 +373,40 @@
     display: block;
     border-radius: 10px;
 }
+                #playPauseBtn {
+    background: #e67e22;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 700;
+    margin-top: 5px;
+}
+#playPauseBtn:hover {
+    background: #d35400;
+}
+
+/* Сердечко для комплиментов */
+.compliment-heart {
+    display: inline-block;
+    animation: heartbeat 1.5s infinite;
+    font-size: 2em;
+    margin-bottom: 5px;
+}
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+/* Картинки внутри комплиментов */
+.cat-image {
+    max-width: 150px;
+    border-radius: 10px;
+    margin: 5px auto;
+    display: block;
+}
     </style>
 </head>
 <body>
@@ -412,6 +446,26 @@
     <div class="meme-box-img">
         <img src="images/meow.jpg" alt="мем дня">
     </div>
+</div>
+                      <div class="helper-box" id="searchBox">
+    <h3>Поиск по ингредиентам</h3>
+    <input type="text" id="searchInput" placeholder="фарш, яйца и тд...">
+    <button class="btn-small" id="searchBtn">Найти</button>
+    <button class="btn-small btn-outline" id="resetSearchBtn">Сбросить</button>
+    <p id="searchResult" style="font-size:0.9em; margin-top:8px;"></p>
+</div>
+
+<div class="helper-box" id="musicBox">
+    <h3>Пасхалка-песня:)</h3>
+    <audio id="ourSong" src="images/song.mp3" preload="auto"></audio>
+    <button class="btn-small" id="playPauseBtn">Включить</button>
+    <span id="musicStatus" style="font-size:0.9em; margin-left:8px;"></span>
+</div>
+
+<div class="helper-box" id="complimentBox">
+    <h3>Няшность:</h3>
+    <p id="complimentMessage" style="font-size:1em; min-height:1.5em;"></p>
+    <button class="btn-small" id="newComplimentBtn">ещё!</button>
 </div>
         </aside>
 
@@ -796,7 +850,105 @@
     }   document.getElementById('randomBtn').addEventListener('click', generateRandomMeal);
 
     renderCards();
+  // ========== ПОИСК ПО ИНГРЕДИЕНТАМ (с синонимами) ==========
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const resetSearchBtn = document.getElementById('resetSearchBtn');
+const searchResult = document.getElementById('searchResult');
 
+// Синонимы и замены (чтобы колбаса находила бутеры и т.д.)
+const ingredientSynonyms = {
+    'колбаса': ['ветчина', 'сосиски'],
+    'ветчина': ['колбаса', 'сосиски'],
+    'сосиски': ['колбаса', 'ветчина'],
+    'молоко': ['сливки'],
+    'сливки': ['молоко'],
+    'масло': ['маргарин'],
+    'маргарин': ['масло'],
+    'сыр': ['сырок'],
+    'сырок': ['сыр'],
+    'курица': ['куриное филе', 'куриный фарш', 'куриного'],
+    'фарш': ['фарша', 'куриный фарш'],
+    'яйца': ['яйцо', 'яйца'],
+    'хлеб': ['лаваш', 'хлеба'],
+    'лаваш': ['хлеб'],
+};
+
+function performSearch() {
+    const raw = searchInput.value.trim();
+    if (!raw) {
+        searchResult.textContent = 'Введите ингредиенты';
+        return;
+    }
+    const userWords = raw.split(',').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
+    if (userWords.length === 0) return;
+
+    // Расширяем запрос синонимами
+    const expandedWords = new Set(userWords);
+    userWords.forEach(word => {
+        const synonyms = ingredientSynonyms[word];
+        if (synonyms) {
+            synonyms.forEach(syn => expandedWords.add(syn));
+        }
+    });
+
+    // Ищем рецепты, где встречается ХОТЯ БЫ ОДНО слово из расширенного запроса
+    const filtered = recipes.filter(recipe => {
+        const allText = recipe.ingredients.join(' ').toLowerCase();
+        return Array.from(expandedWords).some(word => allText.includes(word));
+    });
+
+    const grid = document.getElementById('mealsGrid');
+    grid.innerHTML = '';
+
+    if (filtered.length === 0) {
+        searchResult.textContent = 'Ничего не найдено(';
+        return;
+    }
+
+    searchResult.textContent = `Найдено: ${filtered.length} блюд`;
+
+    const categories = [
+        { title: 'Вторые блюда', key: 'second' },
+        { title: 'Салаты', key: 'salad' },
+        { title: 'Супы', key: 'soup' },
+        { title: 'Перекусы', key: 'snack' }
+    ];
+
+    categories.forEach(cat => {
+        const catRecipes = filtered.filter(r => r.category === cat.key);
+        if (catRecipes.length === 0) return;
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'category-title';
+        titleDiv.textContent = cat.title;
+        grid.appendChild(titleDiv);
+        catRecipes.forEach(recipe => {
+            const card = document.createElement('div');
+            card.className = 'meal-card';
+            card.innerHTML = `
+                <div class="meal-emoji">${recipe.emoji}</div>
+                <div>
+                    <div class="meal-name">${recipe.name}</div>
+                    <div class="meal-time">⏱ ${recipe.time}</div>
+                </div>
+            `;
+            card.addEventListener('click', () => openRecipeModal(recipe));
+            grid.appendChild(card);
+        });
+    });
+}
+
+function resetSearch() {
+    searchInput.value = '';
+    searchResult.textContent = '';
+    renderCards();  // возвращаем полный список
+}
+
+searchBtn.addEventListener('click', performSearch);
+resetSearchBtn.addEventListener('click', resetSearch);
+searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') performSearch();
+});
     // Пасхалка — открыть мем
     document.getElementById('emod1').addEventListener('click', () => {
         const modal = document.getElementById('modal');
@@ -910,6 +1062,66 @@
     // Инициализация планировщика
     renderPresetPlan();
     renderCustomPlan();
+    
+   // ========== ПЛЕЕР ==========
+const audio = document.getElementById('ourSong');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const musicStatus = document.getElementById('musicStatus');
+let musicStarted = false; // флаг первого запуска
+
+playPauseBtn.addEventListener('click', () => {
+    if (!musicStarted) {
+        audio.currentTime = 92;
+        musicStarted = true;
+    }
+    if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = 'Пауза';
+        musicStatus.textContent = 'играет...';
+    } else {
+        audio.pause();
+        playPauseBtn.textContent = ' Включить';
+        musicStatus.textContent = '';
+    }
+});
+
+audio.addEventListener('ended', () => {
+    playPauseBtn.textContent = 'Включить';
+    musicStatus.textContent = '';
+    musicStarted = false; // сбросим, чтобы снова начинать с момента при следующем клике
+});
+audio.addEventListener('ended', () => {
+    playPauseBtn.textContent = 'Включить';
+    musicStatus.textContent = '';});
+    
+    // ========== КОМПЛИМЕНТЫ ==========
+const compliments = [
+    '<img src="images/l1.jpg" alt="мы" class="cat-image"> ',
+    "меня радуют твои сообщения!",
+    "ты пикми!",
+    '<img src="images/l2.jpg" alt=":)" class="cat-image">  ',
+  '<img src="images/l3.jpg" alt=":)" class="cat-image"> ',
+  '<img src="images/l4.jpg" alt=":)" class="cat-image"> ',
+  '<img src="images/l5.jpg" alt=":)" class="cat-image"> ',
+   '<img src="images/l6.jpg" alt=":)" class="cat-image"> ',
+  '<img src="images/l7.jpg" alt=":)" class="cat-image"> ',
+  '<img src="images/l8.jpg" alt=":)" class="cat-image"> мы',
+  '<img src="images/l9.jpg" alt=":)" class="cat-image">мы ',
+     '<img src="images/l12.jpg" alt=":)" class="cat-image"> мы',
+  '<img src="images/l10.jpg" alt=":)" class="cat-image">и это мы ',
+  '<img src="images/l11.jpg" alt=":)" class="cat-image">мы ',
+  '<img src="images/l13.jpg" alt=":)" class="cat-image">ну мы ',
+    '<img src="images/l14.jpg" alt=":)" class="cat-image"> мы',
+      '<img src="images/l15.jpg" alt=":)" class="cat-image">мы ',
+
+
+];
+
+const complimentMessage = document.getElementById('complimentMessage');
+document.getElementById('newComplimentBtn').addEventListener('click', () => {
+    const randomIndex = Math.floor(Math.random() * compliments.length);
+    complimentMessage.innerHTML = compliments[randomIndex];
+});
 </script>
 </body>
 </html>
